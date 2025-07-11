@@ -78,22 +78,43 @@ function GstCalculator() {
     <div className="container px-2 py-4 w-full h-full mx-auto">
       <div className="grid lg:grid-cols-[500px_1fr] xl:grid-cols-[600px_1fr] 2xl:grid-cols-[700px_1fr] grid-cols-1 gap-2">
         {/* Left Card: Information */}
-        <div className="px-1.5 py-6 border border-amber-500">
-          {" "}
-          {/* Added vertical padding for consistency */}
-          <h1 className="text-3xl font-semibold w-60 mb-4">
+        <div className="px-1.5 2sm:px-4 py-6  leading-7">
+          
+          <h1 className="text-2xl font-semibold w-60 mb-3 text-gray-700">
             GST Calculator
-          </h1>{" "}
-          {/* Added margin-bottom */}
-          <span className="text-md text-gray-600">
+          </h1>
+           <div className="flex flex-col justify-center items-center space-y-4">
+          <span className="text-md text-gray-700 font-normal">
             The Goods and Services Tax (GST) is a landmark indirect tax reform
-            implemented in India on July 1st, 2017. Designed to create a "One
-            Nation, One Tax" regime, GST replaced a multitude of indirect taxes
-            previously levied by both central and state governments. This
-            comprehensive, multi-stage, destination-based tax is applied to the
-            supply of goods and services, ensuring tax is collected cumulatively
-            at the final stage of consumption.
+            implemented in India on July 1, 2017. It unified a multitude of
+            previous indirect taxes into a single, comprehensive tax levied on
+            the supply of goods and services. GST is a destination-based,
+            multi-stage tax, meaning it's collected at each stage of value
+            addition and ultimately borne by the end-consumer. Its primary
+            objective was to streamline the tax structure, reduce the cascading
+            effect of taxes, and foster a common national market.
           </span>
+          <span className="text-md text-gray-700 font-normal"> 
+            Under the GST
+            regime, goods and services are divided into distinct tax rates such
+            as 0%, 5%, 12%, 18%, and 28%. However, some products such as
+            petroleum products, alcoholic drinks, and electricity are not taxed
+            under GST. These products are taxed separately by the individual
+            state governments, as per the previous tax regime.</span>
+           </div>
+          <div className="mt-4">
+            <p className="text-2xl font-semibold w-60">Types of GST</p>
+            <span className="text-md text-gray-700 font-normal">
+              To ensure efficient tax collection and distribution, taxes are categorized into four main types.
+            </span>
+           <ul className="list-disc list-inside text-md text-gray-700 font-normal">
+  <li>Central Goods and Services Tax (CGST)</li>
+  <li>State Goods and Services Tax (SGST)</li>
+  <li>Union Territory Goods and Services Tax (UTGST)</li>
+  <li>Integrated Goods and Services Tax (IGST)</li>
+</ul>
+
+          </div>
         </div>
 
         {/* Right Card: Main Calculator Area */}

@@ -2,12 +2,15 @@
 @import "tailwindcss";
 
 @theme {
-  --font-Rubik:'Rubik', 'sans-serif';
-  --breakpoint-2sm:599px;
-  --color-primary:#002860;
-  --color-secondary:#e5e7eb;
-  --color-IntColor:#f9fafb;
-  --color-borderColor:#dc2626
+ --font-Rubik: 'Rubik', sans-serif;
+  --breakpoint-2sm: 599px;
+  --color-primary: #002860;
+  --color-secondary: #e5e7eb;
+  --color-IntColor: #f9fafb;
+  --color-borderColor: #dc2626;
+  --color-fontColor: #35393e;
+  --font-fontweight: bold;
+  --text-textSize: text-md; 
 }
 body{
   font-family: "Rubik", sans-serif;
