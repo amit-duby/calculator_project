@@ -1,19 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { FaRupeeSign } from "react-icons/fa"; // Import FaRupeeSign for consistency
+import { FaRupeeSign } from "react-icons/fa"; 
 
 function PPFCalculator() {
-  // State variables to store user inputs and calculated results
+
   const [perPeriodDeposit, setPerPeriodDeposit] = useState("10000");
-  const [tenure, setTenure] = useState("15"); // Default tenure in years
-  const [interestRate, setInterestRate] = useState("7.1"); // Current PPF interest rate (as of Q1 FY2025-26)
-  const [investmentFrequency, setInvestmentFrequency] = useState("annual"); // 'annual', 'monthly', 'quarterly', 'half-yearly'
+  const [tenure, setTenure] = useState("15");
+  const [interestRate, setInterestRate] = useState("7.1");
+  const [investmentFrequency, setInvestmentFrequency] = useState("annual");
+  const [maturityAmount, setMaturityAmount] = useState(0);
+  const [totalInvestment, setTotalInvestment] = useState(0);
+  const [totalInterest, setTotalInterest] = useState(0);
+  const [errors, setErrors] = useState({});
 
-  const [maturityAmount, setMaturityAmount] = useState(0); // Calculated maturity amount
-  const [totalInvestment, setTotalInvestment] = useState(0); // Calculated total investment
-  const [totalInterest, setTotalInterest] = useState(0); // Calculated total interest earned
-  const [errors, setErrors] = useState({}); // State for error messages
+  // --- Validation Logic ---
+  const validateInputs = () => {
+    let newErrors = {};
+    let isValid = true;
 
-  // Helper to format numbers with Indian locale
+    const P = parseFloat(perPeriodDeposit);
+    const T = parseFloat(tenure);
+    const R = parseFloat(interestRate);
+
+    // Validate Per Period Deposit
+    if (isNaN(P) || P < 100 || P > 100000000) {
+      newErrors.perPeriodDeposit =
+        "Deposit amount must be between ₹100 and ₹10,00,00,000.";
+      isValid = false;
+    }
+
+    // Validate Tenure
+    if (isNaN(T) || T <= 0 || T > 40) {
+      // Changed max to 40 years as per your handleYearChange max
+      newErrors.tenure = "Tenure must be between 1 and 40 years.";
+      isValid = false;
+    }
+
+    // Validate Interest Rate
+    if (isNaN(R) || R < 0.1 || R > 50) {
+      // Changed min to 0.1% and max to 50%
+      newErrors.interestRate = "Interest Rate must be between 0.1% and 50%.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const formatNumber = (num) => {
     if (num === null || isNaN(num)) return "0.00";
     return parseFloat(num).toLocaleString("en-IN", {
@@ -22,16 +54,22 @@ function PPFCalculator() {
     });
   };
 
-  // Core function to calculate PPF maturity and interest using Future Value of Annuity Due
   const calculatePPF = () => {
+    // Only calculate if inputs are valid
+    if (!validateInputs()) {
+      setMaturityAmount(0);
+      setTotalInvestment(0);
+      setTotalInterest(0);
+      return;
+    }
+
     const P = parseFloat(perPeriodDeposit);
     const T = parseFloat(tenure);
     const R = parseFloat(interestRate);
 
-    const rate = R / 100; // Annual interest rate (decimal)
-    let effectiveAnnualInvestment = 0;
+    const rate = R / 100;
 
-    // Determine the effective annual investment based on frequency
+    let effectiveAnnualInvestment = 0;
     switch (investmentFrequency) {
       case "monthly":
         effectiveAnnualInvestment = P * 12;
@@ -43,64 +81,95 @@ function PPFCalculator() {
         effectiveAnnualInvestment = P * 2;
         break;
       case "annual":
-      default: // Default to annual if no match
+      default:
         effectiveAnnualInvestment = P;
         break;
     }
 
+   
     const annuityFactor = (Math.pow(1 + rate, T) - 1) / rate;
-    const calculatedMaturity =
-      effectiveAnnualInvestment * annuityFactor * (1 + rate);
+    const calculatedMaturity = effectiveAnnualInvestment * annuityFactor * (1 + rate);
 
     const calculatedTotalInvestment = effectiveAnnualInvestment * T;
-    const calculatedTotalInterest =
-      calculatedMaturity - calculatedTotalInvestment;
+    const calculatedTotalInterest = calculatedMaturity - calculatedTotalInvestment;
 
-    // Update state with calculated values, rounded to two decimal places
     setMaturityAmount(parseFloat(calculatedMaturity.toFixed(2)));
     setTotalInvestment(parseFloat(calculatedTotalInvestment.toFixed(2)));
     setTotalInterest(parseFloat(calculatedTotalInterest.toFixed(2)));
   };
 
+ 
   useEffect(() => {
-    calculatePPF();
-  }, [perPeriodDeposit, tenure, interestRate, investmentFrequency]); // Dependencies for recalculation
+    const handler = setTimeout(() => {
+      calculatePPF();
+    }, 300); 
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [perPeriodDeposit, tenure, interestRate, investmentFrequency]);
 
+ 
   const handleAmountChange = (e) => {
     const value = e.target.value;
-    if (value.length <= 15) {
-      setPerPeriodDeposit(value);
-      setErrors((prev) => ({ ...prev, perPeriodDeposit: "" }));
+   
+    if (value === "" || /^\d+$/.test(value)) {
+      if (value.length <= 15) { 
+        setPerPeriodDeposit(value);
+        setErrors((prev) => ({ ...prev, perPeriodDeposit: "" })); 
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          perPeriodDeposit: "Amount cannot exceed 15 digits.",
+        }));
+      }
     } else {
       setErrors((prev) => ({
         ...prev,
-        perPeriodDeposit: "Amount cannot exceed ₹100,000,000 or 15 digits.",
+        perPeriodDeposit: "Invalid input. Please enter a number.",
       }));
     }
   };
 
   const handleRateChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 50 && Number(value) >= 0)) {
-      setSipReturn(value);
-      setErrors((prev) => ({ ...prev, sipReturn: "" }));
+  
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      const numValue = parseFloat(value);
+      if (value === "" || (numValue >= 0.1 && numValue <= 50)) { 
+        setInterestRate(value); 
+        setErrors((prev) => ({ ...prev, interestRate: "" }));
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          interestRate: "Interest Rate must be between 0.1% and 50%.",
+        }));
+      }
     } else {
       setErrors((prev) => ({
         ...prev,
-        sipReturn: "Rate cannot exceed 50%.",
+        interestRate: "Invalid input. Please enter a number.",
       }));
     }
   };
 
   const handleYearChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 40 && Number(value) >= 0)) {
-      setTenure(value);
-      setErrors((prev) => ({ ...prev, tenure: "" }));
+    
+    if (value === "" || /^\d+$/.test(value)) {
+      const numValue = parseInt(value, 10);
+      if (value === "" || (numValue >= 1 && numValue <= 40)) { 
+        setTenure(value);
+        setErrors((prev) => ({ ...prev, tenure: "" })); 
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          tenure: "Tenure must be between 1 and 40 years.",
+        }));
+      }
     } else {
       setErrors((prev) => ({
         ...prev,
-        tenure: "Investment tenure cannot exceed 40 years.",
+        tenure: "Invalid input. Please enter a number.",
       }));
     }
   };
@@ -172,10 +241,13 @@ function PPFCalculator() {
                         aria-label="Deposit Amount per period"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    {/* <p className="text-xs text-gray-500 mt-1">
                       Total annual investment must be between ₹500 and
                       ₹1,50,000.
-                    </p>
+                    </p> */}
+                      {errors.perPeriodDeposit && (
+                      <p className="text-red-500 text-sm mt-1">{errors.perPeriodDeposit}</p>
+                    )}
                   </div>
 
                   {/* Tenure Input */}
@@ -209,9 +281,12 @@ function PPFCalculator() {
                         years
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    {/* <p className="text-xs text-gray-500 mt-1">
                       Minimum 15 years (extendable in 5-year blocks)
-                    </p>
+                    </p> */}
+                    {errors.tenure && (
+                      <p className="text-red-500 text-sm mt-1">{errors.tenure}</p>
+                    )}
                   </div>
 
                   {/* Interest Rate Input */}
@@ -247,9 +322,12 @@ function PPFCalculator() {
                     <p className="text-xs text-gray-500 mt-1">
                       Rates are revised quarterly by the government.
                     </p>
+                    {/* {errors.tenure && (
+                      <p className="text-red-500 text-sm mt-1">{errors.tenure}</p>
+                    )} */}
                   </div>
 
-                  {/* Investment Frequency Selector */}
+                
                   <div className="relative group">
                     <label
                       htmlFor="investmentFrequency"

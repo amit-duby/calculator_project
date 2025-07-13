@@ -13,14 +13,37 @@ function SimpleCompound() {
     const [result, setResult] = useState(null);
     const [errors, setErrors] = useState({});
 
-   
+      const validateInputs = () => {
+        let newErrors = {};
+        let isValid = true;
+        const P = parseFloat(principal);
+        const r = parseFloat(rate);
+        const n = parseFloat(time);
+        if (isNaN(P) || P < 100 || P > 10000000) {
+            newErrors.amount = "Amount must be between ₹100 and ₹1,00,00,000.";
+            isValid = false;
+        }
+        if (isNaN(r) || r <= 0 || r > 100) {
+            newErrors.rate = "Annual Return must be between 0.1% and 100%.";
+            isValid = false;
+        }
+        if (isNaN(n) || n <= 0 || n > 100) {
+            newErrors.years = "Duration must be between 1 and 100 years.";
+            isValid = false;
+        }
+        setErrors(newErrors); 
+        return isValid;
+    };
     const formatNumber = (num) => {
         if (num === null || isNaN(num) || num === '') return '0.00';
         return parseFloat(num).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     };
 
     const calculateInterest = () => {
-       
+       if (!validateInputs()) {
+            setResult(null); 
+            return;
+        }
 
         const P = parseFloat(principal);
         const R = parseFloat(rate);
@@ -180,6 +203,7 @@ function SimpleCompound() {
                                                 aria-label="Principal Amount"
                                             />
                                         </div>
+                                          {errors.principal && <p className="text-red-500 text-sm mt-1">{errors.principal}</p>}
                                     </div>
 
                                     {/* Input: Annual Interest Rate */}
@@ -203,6 +227,7 @@ function SimpleCompound() {
                                             />
                                             <label className="size-5 text-md font-normal text-gray-500">%</label>
                                         </div>
+                                         {errors.rate && <p className="text-red-500 text-sm mt-1">{errors.rate}</p>}
                                     </div>
 
                                     {/* Input: Time (Years) */}
@@ -225,6 +250,7 @@ function SimpleCompound() {
                                             />
                                             <label className="text-md font-normal text-gray-500">years</label>
                                         </div>
+                                        {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time}</p>}
                                     </div>
 
                                     {/* Compound-Specific Input */}

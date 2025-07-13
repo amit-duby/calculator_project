@@ -2,84 +2,97 @@
   import { FaRupeeSign } from "react-icons/fa";
 
 function HomeLoanEmi() {
-
-  
     const [loanAmount, setLoanAmount] = useState("10000");
-    const [interestRate, setInterestRate] = useState("6");
-    const [loanPeriod, setLoanPeriod] = useState("3");
-    const [frequency, setFrequency] = useState("monthly");
-  
+  const [interestRate, setInterestRate] = useState("6");
+  const [loanPeriod, setLoanPeriod] = useState("3");
+  const [frequency, setFrequency] = useState("monthly");
+  const [monthlyResult, setMonthlyResult] = useState({ emi: 0, total: 0, interest: 0 });
+  const [yearlyResult, setYearlyResult] = useState({ emi: 0, total: 0, interest: 0 });
+  const [errors, setErrors] = useState({});
 
-    const [monthlyResult, setMonthlyResult] = useState({ emi: 0, total: 0, interest: 0 });
-    const [yearlyResult, setYearlyResult] = useState({ emi: 0, total: 0, interest: 0 });
-    const [errors, setErrors] = useState({}); 
-  
-    /**
-    
-     * @param {number} P 
-     * @param {number} R 
-     * @param {number} N 
-     * @returns {{emi: number, total: number, interest: number}} 
-     */
-    const calculateEmi = (P, R, N) => {
-      if (R === 0) {
-        
-        const emi = P / N;
-        const total = P;
-        const interest = 0;
-  
-        return {
-          emi: Math.round(emi),
-          total: Math.round(total),
-          interest: Math.round(interest)
-        };
-      }
-  
-     
-      const onePlusR_pow_n = Math.pow(1 + R, N);
-  
-  
-      const emi = P * R * onePlusR_pow_n / (onePlusR_pow_n - 1);
-  
-    
-      const total = emi * N;
-  
-      
-      const interest = total - P;
-  
-     
+  const validateInputs = () => {
+    let newErrors = {};
+    let isValid = true;
+    const P = parseFloat(loanAmount);
+    const r = parseFloat(interestRate);
+    const n = parseFloat(loanPeriod);
+
+    if (isNaN(P) || P < 100 || P > 100000000) { 
+      newErrors.loanAmount = "Amount must be between ₹100 and ₹10,00,00,000.";
+      isValid = false;
+    }
+    if (isNaN(r) || r <= 0 || r > 12) {
+      newErrors.interestRate = "Annual Return must be between 0.1% and 12%.";
+      isValid = false;
+    }
+    if (isNaN(n) || n <= 0 || n > 30) {
+      newErrors.loanPeriod = "Duration must be between 1 and 30 years.";
+      isValid = false;
+    }
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  /**
+   * @param {number} P
+   * @param {number} R
+   * @param {number} N
+   * @returns {{emi: number, total: number, interest: number}}
+   */
+  const calculateEmi = (P, R, N) => {
+    if (R === 0) {
+      const emi = P / N;
+      const total = P;
+      const interest = 0;
       return {
         emi: Math.round(emi),
         total: Math.round(total),
         interest: Math.round(interest),
       };
+    }
+    const onePlusR_pow_n = Math.pow(1 + R, N);
+
+    const emi = (P * R * onePlusR_pow_n) / (onePlusR_pow_n - 1);
+
+    const total = emi * N;
+
+    const interest = total - P;
+
+    return {
+      emi: Math.round(emi),
+      total: Math.round(total),
+      interest: Math.round(interest),
     };
-  
-   
-    useEffect(() => {
+  };
+
+  useEffect(() => {
+    if (validateInputs()) { 
       const P = parseFloat(loanAmount);
       const years = parseFloat(loanPeriod);
       const annualRate = parseFloat(interestRate);
-  
-    
+
       if (frequency === "monthly" || frequency === "both") {
-        const R_monthly = annualRate / 12 / 100; 
-        const months = years * 12; 
+        const R_monthly = annualRate / 12 / 100;
+        const months = years * 12;
         const result = calculateEmi(P, R_monthly, months);
         setMonthlyResult(result);
       } else {
-        setMonthlyResult({ emi: 0, total: 0, interest: 0 }); 
+        setMonthlyResult({ emi: 0, total: 0, interest: 0 });
       }
-  
-      
+
       if (frequency === "yearly" || frequency === "both") {
-        const R_yearly = annualRate / 100; 
+        const R_yearly = annualRate / 100;
         const result = calculateEmi(P, R_yearly, years);
         setYearlyResult(result);
       } else {
-        setYearlyResult({ emi: 0, total: 0, interest: 0 }); 
+        setYearlyResult({ emi: 0, total: 0, interest: 0 });
       }
-    }, [loanAmount, interestRate, loanPeriod, frequency]); 
+    } else {
+      // Clear results if inputs are invalid
+      setMonthlyResult({ emi: 0, total: 0, interest: 0 });
+      setYearlyResult({ emi: 0, total: 0, interest: 0 });
+    }
+  }, [loanAmount, interestRate, loanPeriod, frequency]); 
 
  // Loan Amount Validation
 const handleAmountChange = (e) => {
@@ -174,6 +187,9 @@ const handleYearChange = (e) => {
                           min="0"
                         />
                       </div>
+                       {errors.loanAmount && (
+                      <p className="text-red-500 text-sm mt-1">{errors.loanAmount}</p>
+                    )}
                     </div>
   
                     {/* Annual Interest Rate */}
@@ -196,9 +212,10 @@ const handleYearChange = (e) => {
                         />
                         <label className="size-5 text-md font-normal text-gray-500">%</label>
                       </div>
+                       {errors.interestRate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.interestRate}</p>
+                    )}
                     </div>
-  
-                    {/* Loan Tenure */}
                     <div className="relative group">
                       <label htmlFor="loanPeriod" className="block text-sm font-semibold text-gray-800 px-0.5 py-3">
                         Loan Tenure (Years)
@@ -217,6 +234,9 @@ const handleYearChange = (e) => {
                         />
                         <label className="text-md font-normal text-gray-500">years</label>
                       </div>
+                       {errors.loanPeriod && (
+                      <p className="text-red-500 text-sm mt-1">{errors.loanPeriod}</p>
+                    )}
                     </div>
   
                     {/* Payment Frequency */}

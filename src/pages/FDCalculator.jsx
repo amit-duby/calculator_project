@@ -8,32 +8,54 @@ function FDCalculator() {
     const [frequency, setFrequency] = useState('1');
     const [result, setResult] = useState(null);
     const [errors, setErrors] = useState({});
+      const validateInputs = () => {
+    let newErrors = {};
+    let isValid = true;
+    const P = parseFloat(principal);
+    const r = parseFloat(rate);
+    const n = parseFloat(time);
 
+    if (isNaN(P) || P < 100 || P > 100000000) { 
+      newErrors.principal = "Amount must be between ₹100 and ₹10,00,00,000.";
+      isValid = false;
+    }
+    if (isNaN(r) || r <= 0 || r > 30) {
+      newErrors.rate = "Annual Return must be between 0.1% and 30%.";
+      isValid = false;
+    }
+    if (isNaN(n) || n <= 0 || n > 50) {
+      newErrors.time = "Duration must be between 1 and 50 years.";
+      isValid = false;
+    }
+    setErrors(newErrors);
+    return isValid;
+  };
     const calculateFD = () => {
-       
+
+     if (!validateInputs()) {
+      setResult(null); 
+      return;
+    }
         const P = parseFloat(principal);
         const R = parseFloat(rate) / 100;
         const T = parseFloat(time);
         const n = parseInt(frequency);
         const maturityAmount = P * Math.pow(1 + R / n, n * T);
         const interestEarned = maturityAmount - P;
-
         setResult({
             maturityAmount: maturityAmount.toFixed(2),
             interestEarned: interestEarned.toFixed(2),
             principal: P.toFixed(2),
         });
     };
-
     useEffect(() => {
         calculateFD();
     }, [principal, rate, time, frequency]);
-
     const formatNumber = (num) => {
         if (num === null || isNaN(num)) return '0.00';
         return parseFloat(num).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     };
- // Loan Amount Validation
+
 const handleAmountChange = (e) => {
   const value = e.target.value;
   if (value.length <= 15 ) {
@@ -42,36 +64,36 @@ const handleAmountChange = (e) => {
   } else {
     setErrors((prev) => ({
       ...prev,
-      principal: 'Amount cannot exceed ₹100,000,000 or 15 digits.',
+      principal: 'Amount must be between ₹100 and ₹10,00,00,000.',
     }));
   }
 };
 
-// Interest Rate Validation
+
 const handleRateChange = (e) => {
   const value = e.target.value;
   if (value === '' || (Number(value) <= 30 && Number(value) >= 0)) {
     setRate(value);
     setErrors((prev) => ({ ...prev, rate: '' }));
   } else {
-    setErrors((prev) => ({ ...prev, rate: 'Rate cannot exceed 50%' }));
+    setErrors((prev) => ({ ...prev, rate: 'Rate cannot exceed 30%' }));
   }
 };
 
-// Loan Tenure (Years) Validation
+
 const handleYearChange = (e) => {
   const value = e.target.value;
   if (value === '' || (Number(value) <= 50 && Number(value) >= 0)) {
     setTime(value);
     setErrors((prev) => ({ ...prev, time: '' }));
   } else {
-    setErrors((prev) => ({ ...prev, time: 'Loan tenure cannot exceed 30 years' }));
+    setErrors((prev) => ({ ...prev, time: 'Loan tenure cannot exceed 50 years' }));
   }
 };
     return (
         <div className="container w-full h-full px-5 py-6 mx-auto font-inter">
             <div className="grid lg:grid-cols-[420px_1fr] xl:grid-cols-[530px_1fr] 2xl:grid-cols-[640px_1fr] grid-cols-1">
-                {/* Left Section: Introduction and Description */}
+               
                 <div className="px-1 py-6">
                     <h1 className="text-2xl font-bold text-gray-900">Fixed Deposit (FD) Calculator</h1>
                     <p className="text-md text-gray-600 mt-2">
@@ -79,9 +101,9 @@ const handleYearChange = (e) => {
                     </p>
                 </div>
 
-                {/* Right Section: Calculator Inputs and Results */}
+              
                 <div className="bg-secondary h-full rounded-xl flex flex-col">
-                    {/* Header for the Calculator */}
+                  
                     <div className="bg-primary border rounded-t-2xl border-transparent p-5 relative">
                         <div className="flex justify-center items-center">
                             <div className="space-y-1 mt-3 text-center">
@@ -92,20 +114,20 @@ const handleYearChange = (e) => {
                                     Calculate your FD returns
                                 </span>
                             </div>
-                            {/* Rupee icon for visual flair */}
+                            
                             <div className="absolute top-2 2sm:right-20 right-4 lg:right-10 xl:right-20 2xl:right-45 md:right-30 opacity-15 bg-gray-400 border border-transparent rounded-full w-25 h-27 flex items-center justify-center">
                                 <FaRupeeSign size={60} className="text-white" />
                             </div>
                         </div>
                     </div>
 
-                    {/* Input Fields Section */}
+
                     <div className="flex-grow grid grid-cols-1 2sm:grid-cols-2 2sm:px-2 px-4 2sm:space-x-3 py-4 overflow-y-auto">
                         <div className="mt-4 flex flex-col">
                             <h1 className="text-lg font-semibold capitalize px-1 py-4 tracking-wide text-gray-700">Enter Details</h1>
                             <div className="bg-IntColor rounded-xl p-6  shadow flex-grow">
                                 <div className="grid grid-cols-1 gap-y-5">
-                                    {/* Input: Deposit Amount */}
+                                  
                                     <div className="relative group">
                                         <label htmlFor="principal" className="block text-sm font-semibold text-gray-800 px-0.5 py-3">
                                             Deposit Amount (₹):
@@ -125,6 +147,9 @@ const handleYearChange = (e) => {
                                                 aria-label="Deposit Amount"
                                             />
                                         </div>
+                                         {errors.principal && (
+                      <p className="text-red-500 text-sm mt-1">{errors.principal}</p>
+                    )}
                                     </div>
 
                                     {/* Input: Annual Interest Rate */}
@@ -148,6 +173,9 @@ const handleYearChange = (e) => {
                                             />
                                             <label className="size-5 text-md font-normal text-gray-500">%</label>
                                         </div>
+                                                            {errors.rate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.rate}</p>
+                    )}
                                     </div>
 
                                     {/* Input: Time Period */}
@@ -170,6 +198,9 @@ const handleYearChange = (e) => {
                                             />
                                             <label className="text-md font-normal text-gray-500">years</label>
                                         </div>
+                                                                             {errors.time && (
+                      <p className="text-red-500 text-sm mt-1">{errors.time}</p>
+                    )}
                                     </div>
 
                                     {/* Input: Compounding Frequency */}

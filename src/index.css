@@ -9,8 +9,7 @@
   --color-IntColor: #f9fafb;
   --color-borderColor: #dc2626;
   --color-fontColor: #35393e;
-  --font-fontweight: bold;
-  --text-textSize: text-md; 
+ 
 }
 body{
   font-family: "Rubik", sans-serif;

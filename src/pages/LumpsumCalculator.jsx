@@ -1,66 +1,52 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect for real-time updates
-import { FaRupeeSign } from "react-icons/fa"; // Import FaRupeeSign
+import React, { useState, useEffect } from 'react'; 
+import { FaRupeeSign } from "react-icons/fa"; 
 
 function LumpsumCalculator() {
     const [amount, setAmount] = useState('10000');
     const [rate, setRate] = useState('5');
     const [years, setYears] = useState('3');
-    const [futureValue, setFutureValue] = useState('0.00'); // Initialize with 0.00
-    const [gain, setGain] = useState('0.00'); // Initialize with 0.00
-    const [errors, setErrors] = useState({}); // State to hold error messages for each field
-
-    // Validation function
+    const [futureValue, setFutureValue] = useState('0.00'); 
+    const [gain, setGain] = useState('0.00'); 
+    const [errors, setErrors] = useState({}); 
     const validateInputs = () => {
         let newErrors = {};
         let isValid = true;
-
         const P = parseFloat(amount);
         const r = parseFloat(rate);
         const n = parseFloat(years);
-
-        // Validate Amount
         if (isNaN(P) || P < 100 || P > 10000000) {
             newErrors.amount = "Amount must be between ₹100 and ₹1,00,00,000.";
             isValid = false;
         }
-
-        // Validate Rate
         if (isNaN(r) || r <= 0 || r > 30) {
             newErrors.rate = "Annual Return must be between 0.1% and 30%.";
             isValid = false;
         }
-
-        // Validate Years
         if (isNaN(n) || n <= 0 || n > 50) {
             newErrors.years = "Duration must be between 1 and 50 years.";
             isValid = false;
         }
-
-        setErrors(newErrors); // Update the errors state
+        setErrors(newErrors); 
         return isValid;
     };
-
     const calculateLumpsum = () => {
         if (!validateInputs()) {
             setFutureValue('0.00');
             setGain('0.00');
             return;
         }
-
         const P = parseFloat(amount);
-        const r = parseFloat(rate) / 100; // Convert % to decimal
+        const r = parseFloat(rate) / 100; 
         const n = parseFloat(years);
-
         const FV = P * Math.pow(1 + r, n);
         setFutureValue(FV.toFixed(2));
         setGain((FV - P).toFixed(2));
     };
 
-    // Recalculate whenever inputs change
     useEffect(() => {
         const handler = setTimeout(() => {
             calculateLumpsum();
-        }, 300); // Debounce to prevent excessive calculations
+        }, 300); 
 
         return () => clearTimeout(handler);
     }, [amount, rate, years]);
@@ -70,6 +56,35 @@ function LumpsumCalculator() {
         return parseFloat(num).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     };
 
+const handleLumpsumAmountChange = (e) => {
+  const value = e.target.value;
+  if (value<=10000000 || value.length<=15) {
+     setAmount(value);
+   setErrors((prev) => ({ ...prev, amount: '' }));
+  } else {
+  setErrors((prev) => ({ ...prev,amount: "Amount must be between ₹100 and ₹1,00,00,000." }));
+  }
+};
+
+const handleLumpsumRateChange = (e) => {
+  const value = e.target.value;
+  if (value<=30) {
+    setRate(value);
+   setErrors((prev) => ({ ...prev, rate: '' }));
+  } else {
+  setErrors((prev) => ({ ...prev, rate: "Annual Return must be between 0.1% and 30%." }));
+  }
+};
+
+const handleLumpsumYearsChange = (e) => {
+  const value = e.target.value;
+  if (value<=50) {
+   setYears(value);
+   setErrors((prev) => ({ ...prev, years: '' }));
+  } else {
+  setErrors((prev) => ({ ...prev, years: "Duration must be between 1 and 50 years." }));
+  }
+};
     return (
         <div className="container w-full h-full px-5 2sm:px-2 py-6 mx-auto font-inter">
             <div className="grid lg:grid-cols-[420px_1fr] xl:grid-cols-[530px_1fr] 2xl:grid-cols-[640px_1fr] grid-cols-1">
@@ -107,13 +122,13 @@ function LumpsumCalculator() {
                             <h1 className="text-lg font-semibold capitalize px-1 py-4 tracking-wide text-gray-700">Enter Details</h1>
                             <div className="bg-IntColor rounded-xl p-6 shadow flex-grow">
                                 <div className="grid grid-cols-1 gap-y-5">
-                                    {/* Input: Investment Amount */}
+                                    
                                     <div className="relative group">
                                         <label htmlFor="amount" className="block text-sm font-semibold text-gray-800 px-0.5 py-3">
                                             Investment Amount (₹):
                                         </label>
                                         <div className={`flex items-center w-full max-w-xl border rounded-xl px-2 py-1 ${
-                                            errors.amount // Check for error on 'amount' field
+                                            errors.amount 
                                                 ? "border-red-500 shadow-red-300"
                                                 : "border-gray-200 focus-within:border-primary focus-within:shadow-primary focus-within:shadow"
                                         }`}>
@@ -122,7 +137,7 @@ function LumpsumCalculator() {
                                                 type="number"
                                                 id="amount"
                                                 value={amount}
-                                                onChange={(e) => setAmount(e.target.value)} // Direct update, validation in useEffect
+                                                onChange={(e) =>handleLumpsumAmountChange(e)}
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="100"
                                                 max="10000000"
@@ -147,7 +162,7 @@ function LumpsumCalculator() {
                                                 type="number"
                                                 id="rate"
                                                 value={rate}
-                                                onChange={(e) => setRate(e.target.value)} // Direct update, validation in useEffect
+                                                onChange={(e) => handleLumpsumRateChange(e)} // Direct update, validation in useEffect
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="0.1"
                                                 max="30"
@@ -174,7 +189,7 @@ function LumpsumCalculator() {
                                                 type="number"
                                                 id="years"
                                                 value={years}
-                                                onChange={(e) => setYears(e.target.value)} // Direct update, validation in useEffect
+                                                onChange={(e) => handleLumpsumYearsChange(e)} 
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="1"
                                                 max="50"

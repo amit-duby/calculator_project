@@ -17,6 +17,29 @@ function EmiCalculator() {
   });
   const [errors, setErrors] = useState({});
 
+  const validateInputs = () => {
+    let newErrors = {};
+    let isValid = true;
+    const P = parseFloat(loanAmount);
+    const r = parseFloat(interestRate);
+    const n = parseFloat(loanPeriod);
+
+    if (isNaN(P) || P < 100 || P > 100000000) {
+      newErrors.loanAmount = "Amount must be between ₹100 and ₹10,00,00,000.";
+      isValid = false;
+    }
+    if (isNaN(r) || r <= 0 || r > 30) { // Corrected max rate to 30% for consistency
+      newErrors.interestRate =  "Annual Return must be between 0.1% and 30%.";
+      isValid = false;
+    }
+    if (isNaN(n) || n <= 0 || n > 50) { // Corrected max period to 50 years for consistency
+      newErrors.loanPeriod = "Duration must be between 1 and 50 years.";
+      isValid = false;
+    }
+    setErrors(newErrors);
+    return isValid;
+  };
+
   /**
    * @param {number} P
    * @param {number} R
@@ -51,30 +74,37 @@ function EmiCalculator() {
   };
 
   useEffect(() => {
-    const P = parseFloat(loanAmount);
-    const years = parseFloat(loanPeriod);
-    const annualRate = parseFloat(interestRate);
-    if (frequency === "monthly" || frequency === "both") {
-      const R_monthly = annualRate / 12 / 100;
-      const months = years * 12;
-      const result = calculateEmi(P, R_monthly, months);
-      setMonthlyResult(result);
-    } else {
-      setMonthlyResult({ emi: 0, total: 0, interest: 0 });
-    }
+    if (validateInputs()) { 
+      const P = parseFloat(loanAmount);
+      const years = parseFloat(loanPeriod);
+      const annualRate = parseFloat(interestRate);
 
-    if (frequency === "yearly" || frequency === "both") {
-      const R_yearly = annualRate / 100;
-      const result = calculateEmi(P, R_yearly, years);
-      setYearlyResult(result);
+      if (frequency === "monthly" || frequency === "both") {
+        const R_monthly = annualRate / 12 / 100;
+        const months = years * 12;
+        const result = calculateEmi(P, R_monthly, months);
+        setMonthlyResult(result);
+      } else {
+        setMonthlyResult({ emi: 0, total: 0, interest: 0 });
+      }
+
+      if (frequency === "yearly" || frequency === "both") {
+        const R_yearly = annualRate / 100;
+        const result = calculateEmi(P, R_yearly, years);
+        setYearlyResult(result);
+      } else {
+        setYearlyResult({ emi: 0, total: 0, interest: 0 });
+      }
     } else {
+     
+      setMonthlyResult({ emi: 0, total: 0, interest: 0 });
       setYearlyResult({ emi: 0, total: 0, interest: 0 });
     }
   }, [loanAmount, interestRate, loanPeriod, frequency]);
 
   const handleAmountChange = (e) => {
     const value = e.target.value;
-    if (value.length <= 15) {
+    if (value.length <= 15 ) {
       setLoanAmount(value);
       setErrors((prev) => ({ ...prev, loanAmount: "" }));
     } else {
@@ -94,7 +124,7 @@ function EmiCalculator() {
     } else {
       setErrors((prev) => ({
         ...prev,
-        interestRate: "Rate cannot exceed 50%",
+        interestRate: "Annual Return must be between 0.1% and 30%.",
       }));
     }
   };
@@ -108,7 +138,7 @@ function EmiCalculator() {
     } else {
       setErrors((prev) => ({
         ...prev,
-        loanPeriod: "Loan tenure cannot exceed 30 years",
+        loanPeriod: "Loan tenure between 1 and 50 years.",
       }));
     }
   };
@@ -182,6 +212,9 @@ function EmiCalculator() {
                         min="0"
                       />
                     </div>
+                     {errors.loanAmount && (
+                      <p className="text-red-500 text-sm mt-1">{errors.loanAmount}</p>
+                    )}
                   </div>
                   <div className="relative group">
                     <label
@@ -212,6 +245,9 @@ function EmiCalculator() {
                         %
                       </label>
                     </div>
+                     {errors.interestRate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.interestRate}</p>
+                    )}
                   </div>
 
                   {/* Loan Tenure */}
@@ -243,6 +279,9 @@ function EmiCalculator() {
                         years
                       </label>
                     </div>
+                     {errors.loanPeriod && (
+                      <p className="text-red-500 text-sm mt-1">{errors.loanPeriod}</p>
+                    )}
                   </div>
 
                   {/* Payment Frequency */}

@@ -1,76 +1,159 @@
 import React, { useEffect, useState } from "react";
-import { FaRupeeSign } from "react-icons/fa"; // Import FaRupeeSign for consistency
+import { FaRupeeSign } from "react-icons/fa";
 
 function MutualFundCalculator() {
-  const [tab, setTab] = useState("sip");
-  const [sipAmount, setSipAmount] = useState("100000");
-  const [sipYears, setSipYears] = useState("3");
-  const [sipReturn, setSipReturn] = useState("10");
-  const [sipResult, setSipResult] = useState(null);
-  const [lumpAmount, setLumpAmount] = useState("100000");
-  const [lumpYears, setLumpYears] = useState("3");
-  const [lumpReturn, setLumpReturn] = useState("10");
-  const [lumpResult, setLumpResult] = useState(null);
+  const [tab, setTab] = useState("sip"); // 'sip' or 'lumpsum'
+
+  // SIP State
+  const [sipAmount, setSipAmount] = useState("1000"); // Changed default to 1000 for realistic SIP
+  const [sipYears, setSipYears] = useState("10"); // Changed default years
+  const [sipReturn, setSipReturn] = useState("12"); // Changed default return
+  const [sipResult, setSipResult] = useState(null); // Stores object { investedAmount, estimatedReturn, totalValue }
+
+  // Lumpsum State
+  const [lumpAmount, setLumpAmount] = useState("50000"); // Changed default to 50000 for realistic Lumpsum
+  const [lumpYears, setLumpYears] = useState("10"); // Changed default years
+  const [lumpReturn, setLumpReturn] = useState("12"); // Changed default return
+  const [lumpResult, setLumpResult] = useState(null); // Stores object { investedAmount, estimatedReturn, totalValue }
 
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (tab === "sip") {
-      const handler = setTimeout(() => {
-        calculateSIP();
-      }, 500);
-      return () => {
-        clearTimeout(handler);
-      };
-    }
-  }, [sipAmount, sipYears, sipReturn, tab]);
+  // --- Validation Logic ---
+  const validateInputs = (type) => {
+    let isValid = true;
+    let currentErrors = {};
 
-  useEffect(() => {
-    if (tab === "lumpsum") {
-      const handler = setTimeout(() => {
-        calculateLumpsum();
-      }, 500);
-      return () => {
-        clearTimeout(handler);
-      };
-    }
-  }, [lumpAmount, lumpYears, lumpReturn, tab]);
+    if (type === "sip") {
+      const P = parseFloat(sipAmount);
+      const n = parseFloat(sipYears);
+      const r = parseFloat(sipReturn);
 
-  // SIP Calculation
+      if (isNaN(P) || P < 100 || P > 10000000) {
+        currentErrors.sipAmount =
+          "Monthly SIP Amount must be between ₹100 and ₹1,00,00,000.";
+        isValid = false;
+      }
+      if (isNaN(n) || n <= 0 || n > 50) {
+        currentErrors.sipYears = "Investment Duration must be between 1 and 50 years.";
+        isValid = false;
+      }
+      if (isNaN(r) || r < 0.1 || r > 30) {
+        // Changed min to 0.1% for consistency, max 30%
+        currentErrors.sipReturn =
+          "Expected Annual Return must be between 0.1% and 30%.";
+        isValid = false;
+      }
+    } else if (type === "lumpsum") {
+      const P = parseFloat(lumpAmount);
+      const n = parseFloat(lumpYears);
+      const r = parseFloat(lumpReturn);
+
+      if (isNaN(P) || P < 1000 || P > 10000000) {
+        currentErrors.lumpAmount =
+          "Lumpsum Amount must be between ₹1,000 and ₹1,00,00,000.";
+        isValid = false;
+      }
+      if (isNaN(n) || n <= 0 || n > 50) {
+        currentErrors.lumpYears = "Investment Duration must be between 1 and 50 years.";
+        isValid = false;
+      }
+      if (isNaN(r) || r < 0.1 || r > 30) {
+        // Changed min to 0.1% for consistency, max 30%
+        currentErrors.lumpReturn =
+          "Expected Annual Return must be between 0.1% and 30%.";
+        isValid = false;
+      }
+    }
+    setErrors(currentErrors); // Update the errors state
+    return isValid;
+  };
+
+  // --- SIP Calculation & Effect ---
   const calculateSIP = () => {
-    const P = parseFloat(sipAmount);
-    const n = parseFloat(sipYears) * 12; // Convert years to months
-    const r = parseFloat(sipReturn) / 12 / 100; // Convert annual return to monthly decimal
-
-    // Ensure valid numbers before calculation
-    if (isNaN(P) || isNaN(n) || isNaN(r) || P <= 0 || n <= 0 || r < 0) {
-      setSipResult(0); // Set to 0 or null if inputs are invalid
+    if (!validateInputs("sip")) {
+      setSipResult(null); // Clear result if inputs are invalid
       return;
     }
 
+    const P = parseFloat(sipAmount); // Monthly investment
+    const years = parseFloat(sipYears);
+    const annualRate = parseFloat(sipReturn);
+
+    // Convert annual rate to monthly decimal
+    const r = annualRate / 12 / 100;
+    // Convert years to total months
+    const n = years * 12;
+
+    // Total invested amount
+    const investedAmount = P * n;
+
     // Future Value of an Annuity Due (payments at the beginning of the period)
-    const futureValue = P * (((Math.pow(1 + r, n) - 1) * (1 + r)) / r);
-    setSipResult(futureValue.toFixed(2));
+    let futureValue;
+    if (r === 0) {
+      // Handle 0% interest rate separately
+      futureValue = investedAmount;
+    } else {
+      futureValue = P * (((Math.pow(1 + r, n) - 1) * (1 + r)) / r);
+    }
+
+    const estimatedReturn = futureValue - investedAmount;
+
+    setSipResult({
+      investedAmount: Math.round(investedAmount),
+      estimatedReturn: Math.round(estimatedReturn),
+      totalValue: Math.round(futureValue),
+    });
   };
 
-  // Lumpsum Calculation
+  useEffect(() => {
+    // Debounce the calculation
+    const handler = setTimeout(() => {
+      if (tab === "sip") {
+        calculateSIP();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [sipAmount, sipYears, sipReturn, tab]);
+
+  // --- Lumpsum Calculation & Effect ---
   const calculateLumpsum = () => {
+    if (!validateInputs("lumpsum")) {
+      setLumpResult(null); // Clear result if inputs are invalid
+      return;
+    }
+
     const P = parseFloat(lumpAmount);
     const r = parseFloat(lumpReturn) / 100;
     const n = parseFloat(lumpYears);
 
-    // Ensure valid numbers before calculation
-    if (isNaN(P) || isNaN(r) || isNaN(n) || P <= 0 || n <= 0 || r < 0) {
-      setLumpResult(0); // Set to 0 or null if inputs are invalid
-      return;
-    }
+    // Compound interest formula: A = P(1 + r)^n
+    let futureValue = P * Math.pow(1 + r, n);
+    const estimatedReturn = futureValue - P;
 
-    const futureValue = P * Math.pow(1 + r, n);
-    setLumpResult(futureValue.toFixed(2));
+    setLumpResult({
+      investedAmount: Math.round(P),
+      estimatedReturn: Math.round(estimatedReturn),
+      totalValue: Math.round(futureValue),
+    });
   };
 
+  useEffect(() => {
+    // Debounce the calculation
+    const handler = setTimeout(() => {
+      if (tab === "lumpsum") {
+        calculateLumpsum();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [lumpAmount, lumpYears, lumpReturn, tab]);
+
+  // --- Formatting Helper ---
   const formatNumber = (num) => {
-    if (num === null || isNaN(num)) return "";
+    if (num === null || isNaN(num)) return "0";
     return parseFloat(num).toLocaleString("en-IN", {
       maximumFractionDigits: 0,
     });
@@ -78,41 +161,47 @@ function MutualFundCalculator() {
 
   const handleAmountChange = (e) => {
     const value = e.target.value;
-    if (value.length <= 15) {
+    // Allow empty string to clear input, but keep within bounds for actual numbers
+    if (value === "" || (/^\d+$/.test(value) && value.length <= 15)) {
       setSipAmount(value);
       setErrors((prev) => ({ ...prev, sipAmount: "" }));
+    } else if (value.length > 15) {
+      setErrors((prev) => ({
+        ...prev,
+        sipAmount: "Amount cannot exceed 15 digits.",
+      }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        sipAmount: "Amount cannot exceed ₹100,000,000 or 15 digits.",
+        sipAmount: "Invalid input. Please enter a number.",
       }));
     }
   };
 
   const handleRateChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 50 && Number(value) >= 0)) {
-      // Changed max rate to 50%
+    // Allow empty string, and numbers between 0 and 30 (inclusive of 0.1 for min validation)
+    if (value === "" || (Number(value) <= 30 && Number(value) >= 0)) {
       setSipReturn(value);
       setErrors((prev) => ({ ...prev, sipReturn: "" }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        sipReturn: "Rate cannot exceed 50%.",
+        sipReturn: "Expected Annual Return must be between 0.1% and 30%.",
       }));
     }
   };
 
   const handleYearChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 40 && Number(value) >= 0)) {
-      // Changed max years to 40
+    // Allow empty string, and numbers between 0 and 50 (inclusive of 1 for min validation)
+    if (value === "" || (Number(value) <= 50 && Number(value) >= 0)) {
       setSipYears(value);
       setErrors((prev) => ({ ...prev, sipYears: "" }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        sipYears: "Investment tenure cannot exceed 40 years.", // Updated error message
+        sipYears: "Investment Duration must be between 1 and 50 years.",
       }));
     }
   };
@@ -120,41 +209,44 @@ function MutualFundCalculator() {
   // lumpsum handlers
   const handleLumpsumAmountChange = (e) => {
     const value = e.target.value;
-    if (value.length <= 15) {
+    if (value === "" || (/^\d+$/.test(value) && value.length <= 15)) {
       setLumpAmount(value);
       setErrors((prev) => ({ ...prev, lumpAmount: "" }));
+    } else if (value.length > 15) {
+      setErrors((prev) => ({
+        ...prev,
+        lumpAmount: "Amount cannot exceed 15 digits.",
+      }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        lumpAmount: "Amount cannot exceed ₹100,000,000 or 15 digits.",
+        lumpAmount: "Invalid input. Please enter a number.",
       }));
     }
   };
 
   const handleLumpsumRateChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 50 && Number(value) >= 0)) {
-      // Changed max rate to 50%
+    if (value === "" || (Number(value) <= 30 && Number(value) >= 0)) {
       setLumpReturn(value);
       setErrors((prev) => ({ ...prev, lumpReturn: "" }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        lumpReturn: "Rate cannot exceed 50%.",
+        lumpReturn: "Expected Annual Return must be between 0.1% and 30%.",
       }));
     }
   };
 
   const handleLumpsumYearChange = (e) => {
     const value = e.target.value;
-    if (value === "" || (Number(value) <= 40 && Number(value) >= 0)) {
-      // Changed max years to 40
+    if (value === "" || (Number(value) <= 50 && Number(value) >= 0)) {
       setLumpYears(value);
       setErrors((prev) => ({ ...prev, lumpYears: "" }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        lumpYears: "Investment tenure cannot exceed 40 years.", // Updated error message
+        lumpYears: "Investment Duration must be between 1 and 50 years.",
       }));
     }
   };
@@ -202,7 +294,6 @@ function MutualFundCalculator() {
               </h1>
 
               {/* Tab Buttons */}
-
               <div className="bg-gray-50 rounded-xl p-6 shadow flex-grow">
                 <div className="flex justify-center gap-4 mb-6">
                   <button
@@ -258,7 +349,8 @@ function MutualFundCalculator() {
                           value={sipAmount}
                           onChange={handleAmountChange}
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
-                          min="1"
+                          min="100" // Set min attribute
+                          max="10000000" // Set max attribute
                           placeholder="e.g., 5000"
                           aria-label="Monthly SIP Amount"
                         />
@@ -291,7 +383,7 @@ function MutualFundCalculator() {
                           onChange={handleYearChange}
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                           min="1"
-                          max="40" // Corrected max to 40
+                          max="50" // Corrected max to 50
                           placeholder="e.g., 10"
                           aria-label="SIP Investment Duration"
                         />
@@ -325,7 +417,7 @@ function MutualFundCalculator() {
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                           step="0.1"
                           min="0.1"
-                          max="50" // Corrected max to 50
+                          max="30" // Corrected max to 30
                           placeholder="e.g., 12"
                           aria-label="SIP Expected Annual Return"
                         />
@@ -364,7 +456,8 @@ function MutualFundCalculator() {
                           value={lumpAmount}
                           onChange={handleLumpsumAmountChange}
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
-                          min="1"
+                          min="1000" // Set min attribute
+                          max="10000000" // Set max attribute
                           placeholder="e.g., 100000"
                           aria-label="Lumpsum Amount"
                         />
@@ -397,7 +490,7 @@ function MutualFundCalculator() {
                           onChange={handleLumpsumYearChange}
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                           min="1"
-                          max="40" // Corrected max to 40
+                          max="50" // Corrected max to 50
                           placeholder="e.g., 5"
                           aria-label="Lumpsum Investment Duration"
                         />
@@ -431,7 +524,7 @@ function MutualFundCalculator() {
                           className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                           step="0.1"
                           min="0.1"
-                          max="50" // Corrected max to 50
+                          max="30" // Corrected max to 30
                           placeholder="e.g., 15"
                           aria-label="Lumpsum Expected Annual Return"
                         />
@@ -457,35 +550,73 @@ function MutualFundCalculator() {
                 {/* Added h-full here */}
                 <div className="text-center">
                   <div className="space-y-4">
-                    {tab === "sip" && (
+                    {tab === "sip" && sipResult && (
                       <>
                         <div className="flex flex-col justify-between items-center bg-green-50 p-4 rounded-lg shadow-sm">
                           <span className="text-lg font-semibold text-gray-700">
-                            Investment Amount:
+                            Invested Amount:
                           </span>
                           <span className="text-xl font-bold text-green-700">
-                            ₹ {formatNumber(sipResult) || "0"}
-                          </span>{" "}
-                          {/* Changed "0.00" to "0" for cleaner display */}
+                            ₹ {formatNumber(sipResult.investedAmount)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col justify-between items-center bg-yellow-50 p-4 rounded-lg shadow-sm">
+                          <span className="text-lg font-semibold text-gray-700">
+                            Estimated Returns:
+                          </span>
+                          <span className="text-xl font-bold text-yellow-700">
+                            ₹ {formatNumber(sipResult.estimatedReturn)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col justify-between items-center bg-blue-50 p-4 rounded-lg shadow-sm">
+                          <span className="text-lg font-semibold text-gray-700">
+                            Total Value:
+                          </span>
+                          <span className="text-xl font-bold text-blue-700">
+                            ₹ {formatNumber(sipResult.totalValue)}
+                          </span>
                         </div>
                       </>
                     )}
 
-                    {tab === "lumpsum" && (
+                    {tab === "lumpsum" && lumpResult && (
                       <>
                         <div className="flex flex-col justify-between items-center bg-green-50 p-4 rounded-lg shadow-sm">
                           <span className="text-lg font-semibold text-gray-700">
-                            Investment Amount:
+                            Invested Amount:
                           </span>
                           <span className="text-xl font-bold text-green-700">
-                            ₹ {formatNumber(lumpResult) || "0"}
-                          </span>{" "}
-                          {/* Changed "0.00" to "0" for cleaner display */}
+                            ₹ {formatNumber(lumpResult.investedAmount)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col justify-between items-center bg-yellow-50 p-4 rounded-lg shadow-sm">
+                          <span className="text-lg font-semibold text-gray-700">
+                            Estimated Returns:
+                          </span>
+                          <span className="text-xl font-bold text-green-700">
+                            ₹ {formatNumber(lumpResult.estimatedReturn)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col justify-between items-center bg-blue-50 p-4 rounded-lg shadow-sm">
+                          <span className="text-lg font-semibold text-gray-700">
+                            Total Value:
+                          </span>
+                          <span className="text-xl font-bold text-green-700">
+                            ₹ {formatNumber(lumpResult.totalValue)}
+                          </span>
                         </div>
                       </>
                     )}
+
+                    {/* Display placeholder if no result yet */}
+                    {((tab === "sip" && !sipResult) ||
+                      (tab === "lumpsum" && !lumpResult)) && (
+                      <div className="text-white text-lg">
+                        Enter your investment details to see the results.
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-500 mt-40 text-center">
+                  <p className="text-sm text-gray-300 mt-5 text-center">
                     * These are estimated values based on your inputs and
                     assumed rates. Actual returns may vary.
                   </p>
