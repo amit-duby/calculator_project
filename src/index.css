@@ -4,12 +4,15 @@
 @theme {
  --font-Rubik: 'Rubik', sans-serif;
   --breakpoint-2sm: 599px;
+  --breakpoint-3sm:399px;
+  --breakpoint-2md:864px;
   --color-primary: #002860;
   --color-secondary: #e5e7eb;
   --color-IntColor: #f9fafb;
   --color-borderColor: #dc2626;
   --color-fontColor: #35393e;
- 
+  --shadow-boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 -4px 8px rgba(0, 0, 0, 0.1), 4px 0 8px rgba(0, 0, 0, 0.1), -4px 0 8px rgba(0, 0, 0, 0.1);
+  --shadow-2boxShadow: 0 2px 2px rgba(0, 0, 0, 0.1), 0 -2px 2px rgba(0, 0, 0, 0.1), 2px 0 2px rgba(0, 0, 0, 0.1), -2px 0 2px rgba(0, 0, 0, 0.1);
 }
 body{
   font-family: "Rubik", sans-serif;

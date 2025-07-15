@@ -7,47 +7,50 @@ function SimpleCompound() {
     const [rate, setRate] = useState('4');
     const [time, setTime] = useState('2');
 
-    const [compoundings, setCompoundings] = useState('1'); 
+    const [compoundings, setCompoundings] = useState('1');
 
-   
     const [result, setResult] = useState(null);
     const [errors, setErrors] = useState({});
 
-      const validateInputs = () => {
+    // Refined validateInputs to set specific error messages for each field
+    const validateInputs = () => {
         let newErrors = {};
         let isValid = true;
         const P = parseFloat(principal);
         const r = parseFloat(rate);
-        const n = parseFloat(time);
+        const T = parseFloat(time);
+
         if (isNaN(P) || P < 100 || P > 10000000) {
-            newErrors.amount = "Amount must be between ₹100 and ₹1,00,00,000.";
+            newErrors.principal = "Amount must be between ₹100 and ₹1,00,00,000.";
             isValid = false;
         }
-        if (isNaN(r) || r <= 0 || r > 100) {
+        if (isNaN(r) || r <= 0.0 || r > 100) { // Changed 0 to 0.0 for clarity, assuming rate can be very small but not zero or negative
             newErrors.rate = "Annual Return must be between 0.1% and 100%.";
             isValid = false;
         }
-        if (isNaN(n) || n <= 0 || n > 100) {
-            newErrors.years = "Duration must be between 1 and 100 years.";
+        if (isNaN(T) || T <= 0 || T > 100) {
+            newErrors.time = "Duration must be between 1 and 100 years.";
             isValid = false;
         }
-        setErrors(newErrors); 
+        setErrors(newErrors);
         return isValid;
     };
+
     const formatNumber = (num) => {
         if (num === null || isNaN(num) || num === '') return '0.00';
         return parseFloat(num).toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     };
 
     const calculateInterest = () => {
-       if (!validateInputs()) {
-            setResult(null); 
+        if (!validateInputs()) {
+            setResult(null); // Clear previous results if inputs are invalid
             return;
         }
 
         const P = parseFloat(principal);
         const R = parseFloat(rate);
         const T = parseFloat(time);
+
         if (activeTab === 'simple') {
             const SI = (P * R * T) / 100;
             const total = P + SI;
@@ -60,8 +63,6 @@ function SimpleCompound() {
             });
         } else { // activeTab === 'compound'
             const n = parseInt(compoundings);
-           
-
             const r = R / 100;
             const A = P * Math.pow(1 + r / n, n * T);
             const CI = A - P;
@@ -75,48 +76,41 @@ function SimpleCompound() {
         }
     };
 
-    // Use useEffect to trigger calculation automatically on input changes or tab changes
     useEffect(() => {
-        
-        if (principal && rate && time) {
-            calculateInterest();
-        } else {
-            setResult(null); 
-             
-        }
-    }, [principal, rate, time, compoundings, activeTab]); 
+        calculateInterest();
+    }, [principal, rate, time, compoundings, activeTab]);
 
   const handleAgeChange = (e) => {
     const value = e.target.value;
-    if (value === '' || (Number(value) <= 100 && Number(value) >= 0)) {
+    if (value <= 100) {
       setTime(value);
       setErrors((prev) => ({ ...prev, time: '' }));
     } else {
-      setErrors((prev) => ({ ...prev, time: 'Age cannot be more than 50' }));
+      setErrors((prev) => ({ ...prev, time: 'Duration must be between 1 and 100 years.' }));
     }
   };
 
   // Rate input handler
   const handleRateChange = (e) => {
     const value = e.target.value;
-    if (value === ''|| (Number(value) <= 100 && Number(value) >= 0)) {
+    if (Number(value) <= 100 ) {
       setRate(value);
       setErrors((prev) => ({ ...prev, rate: '' }));
     } else {
-      setErrors((prev) => ({ ...prev, rate: 'Rate cannot be more than 50%' }));
+      setErrors((prev) => ({ ...prev, rate: 'Annual Return must be between 0.1% and 100%.' }));
     }
   };
 
   // Amount input handler
   const handleAmountChange = (e) => {
     const value = e.target.value;
-    if ( value.length <= 15) {
+    if ( value.length <= 15 ) {
       setPrincipal(value);
       setErrors((prev) => ({ ...prev, principal: '' }));
     } else {
       setErrors((prev) => ({
         ...prev,
-        principal: 'Amount cannot be more than 10 characters',
+        principal: '"Amount must be between ₹100 and ₹1,00,00,000."',
       }));
     }
   };
@@ -196,7 +190,7 @@ function SimpleCompound() {
                                                 type="number"
                                                 id="principal"
                                                 value={principal}
-                                                onChange={handleAmountChange}
+                                                onChange={(e)=>handleAmountChange(e)}
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="0"
                                                 placeholder="e.g., 50000"
@@ -218,7 +212,7 @@ function SimpleCompound() {
                                                 type="number"
                                                 id="rate"
                                                 value={rate}
-                                                onChange={handleRateChange}
+                                                onChange={(e)=>handleRateChange(e)}
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="0"
                                                 step="0.01"
@@ -242,7 +236,7 @@ function SimpleCompound() {
                                                 type="number"
                                                 id="time"
                                                 value={time}
-                                                onChange={handleAgeChange}
+                                                onChange={(e)=>handleAgeChange(e)}
                                                 className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
                                                 min="0"
                                                 placeholder="e.g., 10"
