@@ -190,43 +190,27 @@ function SIPCalculator() {
     },
   ];
     return (
-        <div className="container w-full h-full px-5 py-6 mx-auto font-inter">
-            <div className="grid lg:grid-cols-[420px_1fr] xl:grid-cols-[530px_1fr] 2xl:grid-cols-[640px_1fr] grid-cols-1">
-                {/* Left Section: Introduction and Description */}
-                <div className="px-1 py-6">
-                    <h1 className="text-2xl font-bold text-gray-900">SIP Calculator</h1>
-                    <p className="text-md text-gray-600 mt-2">
-                        An SIP Calculator is a handy tool that allows investors to gauge the possible returns on their SIP mutual fund investment. By adding the investment amount, the period, and a probable rate of return allows the user to analyse possible returns and make a rational financial choice. Although actual returns will differ based on market conditions, the SIP calculator gives a sound estimate of how investments can increase and thus is a must-have tool for efficient financial planning.
-                    </p>
-                </div>
-
-                {/* Right Section: Calculator Inputs and Results */}
-                <div className="bg-secondary h-full rounded-xl flex flex-col">
-                    {/* Header for the Calculator */}
-                    <div className="bg-primary border rounded-t-2xl border-transparent p-5 relative">
-                        <div className="flex justify-center items-center">
-                            <div className="space-y-1 mt-3 text-center">
-                                <p className="text-3xl tracking-wide font-semibold text-white">
-                                    SIP Calculator
-                                </p>
-                                <span className="text-gray-300 xl:text-md">
-                                    Plan your investments
-                                </span>
-                            </div>
-                            {/* Rupee icon for visual flair */}
-                            <div className="absolute top-2 2sm:right-20 right-4 lg:right-10 xl:right-20 2xl:right-45 md:right-30 opacity-15 bg-gray-400 border border-transparent rounded-full w-25 h-27 flex items-center justify-center">
-                                <FaRupeeSign size={60} className="text-white" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Input Fields Section */}
-                    <div className="flex-grow grid grid-cols-1 2sm:grid-cols-2 2sm:px-2 px-4 2sm:space-x-3 py-4 overflow-y-auto">
-                        <div className="mt-4 flex flex-col">
-                            <h1 className="text-lg font-semibold capitalize px-1 py-4 tracking-wide text-gray-700">Enter Details</h1>
-
+        <div className="px-6 md:px-20 py-10 bg-white w-full">
+            <div className="container max-w-screen-xl mx-auto  3sm:px-10 border">
+                <section className="my-3">
+           <h1 className="text-4xl font-medium text-gray-900 mb-5">
+          GST Calculator
+        </h1>
+        <p className="mb-8">
+           The <strong>GST Calculator</strong> by <strong>UniCX</strong>, your
+          trusted partner from <strong>UniconsultX Solutions Private Limited</strong>,
+          allows you to calculate Goods and Services Tax (GST) accurately and
+          instantly. Whether you're issuing invoices, checking product pricing,
+          or needing to understand your tax breakdown, this
+          <strong> free online tool</strong> simplifies your GST computations
+          and ensures compliance with Indian tax laws.
+        </p>
+      </section>
+                
+                    <div className="grid 2md:grid-cols-2 grid-cols-1 gap-4 space-y-4 md:space-y-0 ">
+                       
                             {/* Tab Buttons */}
-                            <div className="bg-IntColor rounded-xl p-6 shadow flex-grow">
+                            <div className="rounded-lg px-0 pr-6 py-0   pb-15 w-full max-w-[40rem] opacity-85">
                                 <div className="flex justify-center gap-4 mb-6">
                                     <button
                                         className={`px-6 py-1.5 rounded-lg font-semibold text-lg transition-all duration-300 ${
@@ -252,21 +236,21 @@ function SIPCalculator() {
                                     <div className="grid grid-cols-1 gap-y-5">
                                         {/* Input: Monthly SIP Amount */}
                                         <div className="relative group">
-                                            <label htmlFor="sipAmount" className="block text-sm font-semibold text-gray-800 px-0.5 py-3">
+                                            <label htmlFor="sipAmount" className="block text-gray-800 font-semibold mb-2">
                                                 Monthly SIP Amount (₹)
                                             </label>
-                                            <div className={`flex items-center w-full max-w-xl border rounded-xl px-2 py-1 ${
+                                            <div className={`flex items-center border rounded-xl shadow-2boxShadow px-3 py-2 mr-7 ${
                                                 errorMessage.sipAmount // Check if there's an error for sipAmount
-                                                    ? "border-red-500 shadow-red-300"
-                                                    : "border-gray-200 focus-within:border-primary focus-within:shadow-primary focus-within:shadow"
+                                                    ? "border-red-400 shadow-sm"
+                    : "border-gray-300 focus-within:border-primary focus-within:shadow-xl focus-within:shadow-blue-50"
                                             }`}>
-                                                <label className="size-5 text-md font-normal text-gray-500">₹</label>
+                                                 <FaRupeeSign className="text-gray-500 mr-2" />
                                                 <input
                                                     type="number"
                                                     id="sipAmount"
                                                     value={sipAmount}
                                                     onChange={handleSipAmountChange}
-                                                    className="w-full p-1.5 text-gray-600 font-medium outline-none bg-transparent"
+                                                    className="w-full text-gray-700 font-medium outline-none bg-transparent"
                                                     min="100"
                                                     max="1000000"
                                                     placeholder="e.g., 5000"
@@ -412,11 +396,11 @@ function SIPCalculator() {
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        
 
                         {/* Results Section */}
-                        <div className="mt-4 flex flex-col">
-                            <h1 className="text-lg font-semibold capitalize text-gray-700 px-2 py-4 tracking-wider">Results</h1>
+                        <div className=" flex flex-col">
+                          
                             <div className="bg-primary rounded-xl p-6 shadow flex flex-col justify-between h-full">
                                 <div className="text-center">
                                     <div className="space-y-4">
@@ -473,8 +457,8 @@ function SIPCalculator() {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                
+           
           <div className="space-y-12 text-gray-800 text-[15px] leading-relaxed">
 
       {/* Main Title & Intro - Using the HRA "updates" style for prominence */}
@@ -811,6 +795,7 @@ function SIPCalculator() {
         </p>
       </footer>
     </div>
+     </div>
         </div>
     );
 }

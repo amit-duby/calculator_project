@@ -166,42 +166,28 @@ const handleAnnualSalaryPercent = (e) => {
   ];
 
     return (
-        <div className="container w-full h-full px-5 py-6 mx-auto font-inter">
-            <div className="grid lg:grid-cols-[420px_1fr] xl:grid-cols-[530px_1fr] 2xl:grid-cols-[640px_1fr] grid-cols-1">
-                {/* Left Section: Introduction and Description */}
-                <div className="px-1 py-6">
-                    <h1 className="text-2xl font-bold text-gray-900">NPS Calculator</h1>
-                    <p className="text-md text-gray-600 mt-2">
-                        Estimate your National Pension System (NPS) corpus and monthly pension at retirement.
-                        Plan your retirement savings effectively with this calculator.
-                    </p>
-                </div>
-
-                {/* Right Section: Calculator Inputs and Results */}
-                <div className="bg-secondary h-full rounded-xl flex flex-col">
-                    {/* Header for the Calculator */}
-                    <div className="bg-primary border rounded-t-2xl border-transparent p-5 relative">
-                        <div className="flex justify-center items-center">
-                            <div className="space-y-1 mt-3 text-center">
-                                <p className="text-3xl tracking-wide font-semibold text-white">
-                                    NPS Calculator
-                                </p>
-                                <span className="text-gray-300 xl:text-md">
-                                    Estimate your retirement pension
-                                </span>
-                            </div>
-                            {/* Rupee icon for visual flair */}
-                            <div className="absolute top-2 2sm:right-20 right-4 lg:right-10 xl:right-20 2xl:right-45 md:right-30 opacity-15 bg-gray-400 border border-transparent rounded-full w-25 h-27 flex items-center justify-center">
-                                <FaRupeeSign size={60} className="text-white" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Input Fields Section */}
-                    <div className="flex-grow grid grid-cols-1 2sm:grid-cols-2 2sm:px-2 px-4 2sm:space-x-3 py-4 overflow-y-auto">
-                         <div className="mt-4 flex flex-col"> {/* flex-col to stack its children vertically */}
-              <h1 className="text-lg font-semibold capitalize px-1 py-4 tracking-wide text-gray-700">Enter Details</h1>
-                        <div className="bg-IntColor rounded-xl p-6 shadow flex-grow">
+        <div className=" px-6 md:px-20 py-10 bg-white w-full">
+            <div className="container max-w-screen-xl mx-auto  3sm:px-10 border">
+              
+              <section className="my-3">
+           <h1 className="text-4xl font-medium text-gray-900 mb-5">
+          GST Calculator
+        </h1>
+        <p className="mb-8">
+           The <strong>GST Calculator</strong> by <strong>UniCX</strong>, your
+          trusted partner from <strong>UniconsultX Solutions Private Limited</strong>,
+          allows you to calculate Goods and Services Tax (GST) accurately and
+          instantly. Whether you're issuing invoices, checking product pricing,
+          or needing to understand your tax breakdown, this
+          <strong> free online tool</strong> simplifies your GST computations
+          and ensures compliance with Indian tax laws.
+        </p>
+      </section>
+                <div className="grid 2md:grid-cols-2 grid-cols-1 gap-4 space-y-4 md:space-y-0  ">
+                    {/* <div className="flex-grow grid grid-cols-1 2sm:grid-cols-2 2sm:px-2 px-4 2sm:space-x-3 py-4 overflow-y-auto"> */}
+                        
+       
+                        <div className="rounded-lg px-0 pr-6 py-0   pb-15 w-full max-w-[40rem] opacity-85">
                             <div className="grid grid-cols-1 gap-y-5">
                                 {/* Input: Current Age */}
                                 <div className="relative group">
@@ -286,7 +272,7 @@ const handleAnnualSalaryPercent = (e) => {
                                 <p>Expected Annuity Return: {fixedExpectedAnnuityReturn}%</p>
                             </div>
                         </div>
-</div>
+
                         {/* Results Section */}
                            <div className="mt-4 flex flex-col"> 
               <h1 className="text-lg font-semibold capitalize text-gray-700 px-2 py-4 tracking-wider">Results</h1>
@@ -342,12 +328,10 @@ const handleAnnualSalaryPercent = (e) => {
                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
+                
          <div className="space-y-12 text-gray-800 text-[15px] leading-relaxed border">
       {/* Hero Section / Introduction - Styled like GST's intro */}
-      <section className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-md shadow-sm">
+      <section className="bg-blue-50 border-l-4 border-blue-500 p-0 rounded-md shadow-sm">
         <h2 className="text-2xl font-bold text-blue-700 mb-3 gap-2 flex items-center">
           {/* <AlertCircle size={18} className="mr-2 mt-1 flex-shrink-0" /> {/* Example icon, uncomment if using */}
           Your Retirement Future, Calculated: UniCX NPS Calculator
@@ -712,6 +696,7 @@ const handleAnnualSalaryPercent = (e) => {
       </section>
     </div>
         </div>
+        </div> 
     )
 }
 

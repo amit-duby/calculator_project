@@ -452,6 +452,7 @@ import gstlogo from "../assets/gstlogo.png";
 import gsttype from "../assets/gsttypes.png";
 import critical from "../assets/criticalupdates.png";
 import calculator from "../assets/GstCalculator.png"
+// import '../style/gstStyle.css'
 function GstCalculator() {
   const [show, setShow] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -660,19 +661,11 @@ function GstCalculator() {
       );
     })}
   </div>
-  {/* Show more/less button */}
-  {/* {rates.length > 11 && (
-    <button
-      onClick={toggleShow}
-      className="mt-3 text-sm text-primary underline hover:text-blue-700"
-    >
-      {showAll ? "Show Less" : "Show More"}
-    </button>
-  )} */}
+  
 </div>
 
 
-            {/* Supply Type */}
+           
             <div className="mt-9">
               <label className="block text-gray-800 font-semibold mb-2">
                 Supply Type
@@ -692,14 +685,6 @@ function GstCalculator() {
 
           {/* Right - Result Section */}
           <div className="rounded-lg px-6 py-6 shadow-boxShadow bg-white w-full  ">
-            {/* <div className="flex justify-between items-center my-4 bg-blue-800 py-4 px-10 rounded ">
-              <h2 className="text-md font-semibold text-gray-100">
-                Total Amount
-              </h2>
-              <p className="text-md font-semibold text-gray-100">
-                ₹ {totalAmount}
-              </p>
-            </div> */}
            <div className="mt-5">
             <div className="space-y-4">
               <div className="flex justify-between border-b-2 py-3 border-gray-300">
@@ -763,22 +748,15 @@ function GstCalculator() {
         </div>
 
         {/* Optional Additional Section */}
-        <div className="mt-10 ">
+        <div className="mt-10">
          
   <div className="space-y-12 text-gray-800 text-[15px] leading-relaxed  ">
       {/* Intro - Expanded */}
       <section className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-md shadow-sm  ">
         <h2 className="text-2xl font-bold text-blue-700 mb-3 gap-2 flex items-center">
-         {/* <img
-          src={critical}
-          alt="Critical GST Updates - Announcement icon"
-          className="w-8 h-8 rounded-full flex-shrink-0" 
-        /> */}
          <AlertCircle size={18} className="mr-2 mt-1 flex-shrink-0" />
           Important GST Updates: What's New from July 2025!
         </h2>
-        
-        
         <p className="text-blue-800 mb-4">
           The <strong>GST framework in India</strong> has undergone significant
           procedural updates effective <strong>July 1, 2025</strong>. It is
@@ -856,7 +834,6 @@ function GstCalculator() {
 
       </section>
 
-      {/* What is GST - Expanded */}
       <section > 
         
           

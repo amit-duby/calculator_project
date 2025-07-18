@@ -1126,7 +1126,7 @@ function EPFCalculator() {
                 </div>
 
                 {/* What is EPF Section */}
-                <section className="mt-10">
+                <section className="mt-0">
                     <div className="grid lg:grid-cols-2 grid-cols-1 gap-4">
                         <div>
                             <h2 className="text-2xl font-bold mb-3">
@@ -1454,19 +1454,19 @@ function EPFCalculator() {
                         <p className="text-gray-700 mb-2">
                             📊 <strong>Example Scenario:</strong>
                         </p>
-                        <p className="text-green-700 font-semibold">
+                        <p className="text-green-500 font-semibold">
                             Current Age: <strong>25 years</strong>
                         </p>
-                        <p className="text-green-700 font-semibold">
+                        <p className="text-green-500 font-semibold">
                             Retirement Age: <strong>58 years</strong>
                         </p>
-                        <p className="text-green-700 font-semibold">
+                        <p className="text-green-500 font-semibold">
                             Monthly Basic Salary + DA: <strong>₹30,000</strong>
                         </p>
-                        <p className="text-green-700 font-semibold">
+                        <p className="text-green-500 font-semibold">
                             Estimated Annual Increment: <strong>5%</strong>
                         </p>
-                        <p className="text-green-700 font-semibold">
+                        <p className="text-green-500 font-semibold">
                             Current EPF Balance: <strong>₹50,000</strong>
                         </p>
                         <p className="text-primary font-bold text-lg mt-3">
